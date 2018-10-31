@@ -1,0 +1,60 @@
+stack based command line calculator
+goal:
+a terminal based calculator that allows for quick but non trivial computations
+
+basic operation:
+user can either enter a number which gets pushed to the stack
+or enter a command which pops some number of elements and pushes the result
+
+other features:
+- special commands to e.g. create new stacks and switch between stacks
+  (generally leave the contents of each stack untouched)
+  - make stack of given type
+  - rename stack (needs a string stack? what types do names have?)
+  - set active stack (how?)
+  - manipulate stack stack?
+  - set format string for a given stack
+
+- redirection of input and output also have separate input-active and
+  output-active stack pointers
+  - should these be objects that can be pushed and popped?
+
+- ability to escape commands to be pushed onto the stack, the idea here is to
+  allow the ability to write composite commands e.g. with current stack
+  ...
+  5
+  *sum
+  1         `def<ret>` creates a new command sum5 which is 5 partially applied
+  "sum5" ->  to sum
+  or
+  ...
+  <*>
+  sum
+  <*>
+  swap
+  */       creates a function to average <*> things, this is a special place
+  "avg" -> holder value to allow more complicated function definitions
+
+- ability to link stacks to work on them in parallel, most commands would be
+  duplicated across both stacks, e.g. sum the first ten elements of each stack
+  by `10<ret>sum<ret>`, possibility of special commands that work differently
+
+- tab completion of builtin and user defined commands
+
+- ability to important and export stacks (to csv) and user defined commands
+
+- type system? if we're writing in rust the easiest thing is to inherit rusts
+  types which are nice: [unsigned] int of 8,16,32,64 bytes, float of 32,64 byte
+  questions:
+  - would be nice to also have complex numbers
+  - what about strings?
+  - user defined types?
+  - type coersion and typed stacks?
+    - easiest implementation is that each stack is strictly typed using lists in
+      rust, coersion from int -> float isn't super hard, but weird edge cases
+    - mixed stacks probably become infeasible with strings and/or user defined
+      types
+    - hard to allow user defined functions without mixed stacks
+  - meta functions are a pain if things are strongly typed, what if we add a
+    command/special stack that takes meta-objects, any command can draw from
+    both active and command stack

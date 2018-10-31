@@ -1,0 +1,6 @@
+[package]
+name = "lib"
+version = "0.1.0"
+authors = ["Matthew Kousoulas <shaman.kous@gmail.com>"]
+
+[dependencies]

@@ -1,0 +1,10 @@
+[package]
+name = "calc"
+version = "0.1.0"
+authors = ["Matthew Kousoulas <shaman.kous@gmail.com>"]
+
+[workspace]
+
+[dependencies]
+lib = { path = "lib" }
+
