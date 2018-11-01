@@ -1,7 +1,8 @@
 use std::io;
 use std::fmt;
+use std::process;
 
-use stack::*;
+// use stack::*;
 
 type Sfunc = fn(&[Entry]) -> Entry;
 
@@ -26,8 +27,42 @@ impl fmt::Debug for Operator {
 }
 
 pub fn bin_plus(v: &[Entry]) -> Entry {
-	// v[0] + v[1]
-	Entry::Int(5)
+	match v {
+		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x+y),
+		_ => Entry::Panic(format!{"bad args: {:?}", v}),
+	}
+}
+
+pub fn bin_times(v: &[Entry]) -> Entry {
+	match v {
+		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x*y),
+		_ => Entry::Panic(format!{"bad args: {:?}", v}),
+	}
+}
+
+pub fn bin_minus(v: &[Entry]) -> Entry {
+	match v {
+		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x-y),
+		_ => Entry::Panic(format!{"bad args: {:?}", v}),
+	}
+}
+
+pub fn bin_divide(v: &[Entry]) -> Entry {
+	match v {
+		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x/y),
+		_ => Entry::Panic(format!{"bad args: {:?}", v}),
+	}
+}
+
+pub fn bin_remainder(v: &[Entry]) -> Entry {
+	match v {
+		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x%y),
+		_ => Entry::Panic(format!{"bad args: {:?}", v}),
+	}
+}
+
+pub fn quit(_v: &[Entry]) -> Entry {
+	process::exit(0);
 }
 
 // fn sum(n: usize) -> fn(&[i64]) -> i64 {

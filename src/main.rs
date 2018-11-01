@@ -4,8 +4,8 @@ use std::string::ParseError;
 use std::collections::HashMap;
 
 extern crate lib;
-use entry::*;
-use stack::*;
+use lib::entry::*;
+use lib::stack::*;
 
 #[derive(Debug)]
 enum ParseType {
@@ -42,23 +42,33 @@ fn main() {
 	let mut stack: Stack = Stack::new();
 	let mut operators = HashMap::new();
 	operators.insert("+".to_string(), Operator { name: "+".to_string(), arity: 2, body: bin_plus });
+	operators.insert("*".to_string(), Operator { name: "*".to_string(), arity: 2, body: bin_times });
+	operators.insert("-".to_string(), Operator { name: "-".to_string(), arity: 2, body: bin_minus });
+	operators.insert("/".to_string(), Operator { name: "/".to_string(), arity: 2, body: bin_divide });
+	operators.insert("%".to_string(), Operator { name: "%".to_string(), arity: 2, body: bin_remainder });
+	operators.insert("q".to_string(), Operator { name: "q".to_string(), arity: 0, body: quit });
+
+	// let mut execute = false;
 
 	loop {
 		let mut s = String::new();
 		io::stdin().read_line(&mut s)
 			.expect("Failed to read line.");
 
-		let i: Entry = match s.trim().parse::<ParseType>()
+		stack.push(match s.trim().parse::<ParseType>()
 			.map(|i| ParseType::get_entry(i, &operators)) {
 				Ok(val) => val,
-				Err(_) => continue,
-			};
+				Err(_) => panic!("parse error on: {}", s),
+			});
 
-		match i {
-			Entry::Op(_) => stack.push(i).operate(),
-			Entry::Int(_) => stack.push(i),
-			Entry::Panic(s) => panic!(s),
-		};
+		// println!("peeking: {:?}", stack.peek());
+		loop {
+			match stack.peek() {
+				Some(Entry::Panic(_)) => stack.panic(),
+				Some(Entry::Op(_)) => stack.operate(),
+				_ => break,
+			}
+		}
 
 		println!("stack: {:?}", stack);
 	}
