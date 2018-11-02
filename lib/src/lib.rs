@@ -1,5 +1,6 @@
 pub mod stack;
 pub mod entry;
+pub mod operator;
 
 #[cfg(test)]
 mod tests {

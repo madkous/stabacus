@@ -7,4 +7,10 @@ authors = ["Matthew Kousoulas <shaman.kous@gmail.com>"]
 
 [dependencies]
 lib = { path = "lib" }
+termion = "1"
+# syn = "0.15"
+# quote = "0.6"
+
+# [lib]
+# proc-macro = true
 

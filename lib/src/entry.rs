@@ -1,10 +1,7 @@
-use std::io;
-use std::fmt;
-use std::process;
+use std::str::FromStr;
+use std::string::ParseError;
 
-// use stack::*;
-
-type Sfunc = fn(&[Entry]) -> Entry;
+use operator::*;
 
 #[derive(Clone,Debug)]
 pub enum Entry {
@@ -13,57 +10,35 @@ pub enum Entry {
 	Panic(String),
 }
 
-#[derive(Clone)]
-pub struct Operator {
-	pub name: String,
-	pub arity: usize,
-	pub body: Sfunc,
+#[derive(Debug)]
+pub enum ParseType {
+	Str(String),
+	Int(i64),
 }
 
-impl fmt::Debug for Operator {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "Operator {}:{}", self.name, self.arity)
+impl FromStr for ParseType {
+	type Err = ParseError;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s.parse::<i64>() {
+			Ok(n)  => Ok(ParseType::Int(n)),
+			Err(_) => Ok(ParseType::Str(s.to_string())),
+		}
 	}
 }
 
-pub fn bin_plus(v: &[Entry]) -> Entry {
-	match v {
-		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x+y),
-		_ => Entry::Panic(format!{"bad args: {:?}", v}),
-	}
-}
+// impl ParseType {
+// 	fn get_entry(self, ops: &HashMap<String,Operator>) -> Entry {
+// 		match self {
+// 			ParseType::Int(z)   => Entry::Int(z),
+// 			ParseType::Str(s)   => match ops.get(&s) {
+// 				Some(o) => Entry::Op(o.clone()),
+// 				None    => Entry::Panic(format!("Unknown Operator: {}", s)),
+// 			},
+// 		}
+// 	}
+// }
 
-pub fn bin_times(v: &[Entry]) -> Entry {
-	match v {
-		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x*y),
-		_ => Entry::Panic(format!{"bad args: {:?}", v}),
-	}
-}
-
-pub fn bin_minus(v: &[Entry]) -> Entry {
-	match v {
-		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x-y),
-		_ => Entry::Panic(format!{"bad args: {:?}", v}),
-	}
-}
-
-pub fn bin_divide(v: &[Entry]) -> Entry {
-	match v {
-		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x/y),
-		_ => Entry::Panic(format!{"bad args: {:?}", v}),
-	}
-}
-
-pub fn bin_remainder(v: &[Entry]) -> Entry {
-	match v {
-		&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x%y),
-		_ => Entry::Panic(format!{"bad args: {:?}", v}),
-	}
-}
-
-pub fn quit(_v: &[Entry]) -> Entry {
-	process::exit(0);
-}
 
 // fn sum(n: usize) -> fn(&[i64]) -> i64 {
 

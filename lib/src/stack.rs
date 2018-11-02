@@ -21,6 +21,10 @@ impl Stack {
 		self.0.pop()
 	}
 
+	pub fn as_slice(&self) -> &[Entry] {
+		self.0.as_slice()
+	}
+
 	pub fn peek(&self) -> Option<&Entry> {
 		self.0.as_slice().last()
 	}
@@ -30,28 +34,26 @@ impl Stack {
 		let height = self.len() - depth;
 		Stack(self.0.split_off(height))
 	}
-	
-	pub fn as_slice(&self) -> &[Entry] {
-		self.0.as_slice()
-	}
 
 	pub fn operate(&mut self) {
 		let r = match self.pop() {
 			Some(Entry::Op(op)) =>
 				if self.len() < op.arity{
-					Entry::Panic(format!("cannot apply: {} has arity {}, stack has {} elements",
-								   op.name, op.arity, self.len()))
+					Some(Entry::Panic(format!("cannot apply: {} has arity {}, stack has {} elements",
+								   op.name, op.arity, self.len())))
 				} else {
 					let args = self.pop_slice(op.arity);
 					(op.body)(args.as_slice())
 				},
 			Some(e) =>
-				Entry::Panic(format!("tried to operate with non-operator entry: {:?}",
-							   e)),
+				Some(Entry::Panic(format!("tried to operate with non-operator entry: {:?}",
+							   e))),
 			None =>
-				Entry::Panic("tried to operate with empty stack".to_string()),
+				Some(Entry::Panic("tried to operate with empty stack".to_string())),
 		};
-		self.push(r);
+		if let Some(e) = r {
+			self.push(e);
+		}
 	}
 
 	pub fn panic(&mut self) {
