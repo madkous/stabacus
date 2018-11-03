@@ -1,17 +1,12 @@
-// use std::io;
 use std::fmt;
-use std::process;
 use std::collections::HashMap;
-
-extern crate proc_macro;
-// use syn::Ident;
 
 use entry::*;
 
 #[derive(Debug)]
 pub struct OpMap(HashMap<String,Operator>);
 
-type Sfunc = (fn(&[Entry]) -> Option<Entry>);
+type Sfunc = (fn(&[Entry]) -> Entry);
 
 #[derive(Clone)]
 pub struct Operator {
@@ -35,6 +30,12 @@ macro_rules! opmap {
 impl fmt::Debug for Operator {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "Op {}:{}", self.name, self.arity)
+	}
+}
+
+impl fmt::Display for Operator {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}:{}", self.name, self.arity)
 	}
 }
 
@@ -78,11 +79,11 @@ impl OpMap {
 
 macro_rules! bin_func {
 	( $op:tt, $n:ident ) => {
-		fn $n(v: &[Entry]) -> Option<Entry> {
-			Some(match v {
+		fn $n(v: &[Entry]) -> Entry {
+			match v {
 				&[Entry::Int(x), Entry::Int(y)] => Entry::Int(x $op y),
 				_ => Entry::Panic(format!("bad args: {:?}", v)),
-			})
+			}
 		}
 	};
 }
@@ -95,27 +96,27 @@ bin_func!(%, bin_remainder);
 
 macro_rules! nary_func { // TODO: get rid of name
 	( $op:tt, $id:expr, $i:ident, $n:expr) => {
-		fn $i(v: &[Entry]) -> Option<Entry> {
-			Some(match v {
+		fn $i(v: &[Entry]) -> Entry {
+			match v {
 				&[Entry::Int(n)] =>
 					Entry::Op(Operator { name: format!("{}{}", $n, n), arity: n as usize,
 					body: |u: &[Entry]| {
 						let mut i = u.iter();
 						let mut c: i64 = match i.next() {
 							Some(Entry::Int(m)) => *m,
-							x => return Some(Entry::Panic(format!("bad arg: {:?} in {:?}", x, u)))
+							x => return Entry::Panic(format!("bad arg: {:?} in {:?}", x, u))
 						};
 						for x in i {
 							if let Entry::Int(m) = x {
 								c = c $op m;
 							} else {
-								return Some(Entry::Panic(format!("bad arg: {:?} in {:?}", x, u)));
+								return Entry::Panic(format!("bad arg: {:?} in {:?}", x, u));
 							}
 						}
-						Some(Entry::Int(c))
+						Entry::Int(c)
 					}}),
 				_ => Entry::Panic(format!("bad args: {:?}", v)),
-			})
+			}
 		}
 	};
 }
@@ -123,11 +124,11 @@ macro_rules! nary_func { // TODO: get rid of name
 nary_func!(+, 1, sum, "sum");
 nary_func!(*, 0, prod, "prod");
 
-fn quit(_v: &[Entry]) -> Option<Entry> {
-	process::exit(0);
+fn quit(_v: &[Entry]) -> Entry {
+	Entry::Die
 }
 
-fn pop(_v: &[Entry]) -> Option<Entry> {
-	None
+fn pop(_v: &[Entry]) -> Entry {
+	Entry::Pop
 }
 

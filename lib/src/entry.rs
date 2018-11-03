@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 use std::string::ParseError;
 
@@ -8,6 +9,20 @@ pub enum Entry {
 	Op(Operator),
 	Int(i64),
 	Panic(String),
+	Die,
+	Pop,
+}
+
+impl fmt::Display for Entry {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		match self {
+			Entry::Op(o)    => write!(f, "{}",  o),
+			Entry::Int(n)   => write!(f, "{}",  n),
+			Entry::Panic(s) => write!(f, "!{}", s),
+			Entry::Die      => write!(f, "Die"),
+			Entry::Pop      => write!(f, "Pop"),
+		}
+    }
 }
 
 #[derive(Debug)]
@@ -26,19 +41,4 @@ impl FromStr for ParseType {
 		}
 	}
 }
-
-// impl ParseType {
-// 	fn get_entry(self, ops: &HashMap<String,Operator>) -> Entry {
-// 		match self {
-// 			ParseType::Int(z)   => Entry::Int(z),
-// 			ParseType::Str(s)   => match ops.get(&s) {
-// 				Some(o) => Entry::Op(o.clone()),
-// 				None    => Entry::Panic(format!("Unknown Operator: {}", s)),
-// 			},
-// 		}
-// 	}
-// }
-
-
-// fn sum(n: usize) -> fn(&[i64]) -> i64 {
 
