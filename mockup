@@ -24,4 +24,4 @@
 | 3            | | 123          | |              | | sum5      |
 +--------------+ +--------------+ +--------------+ +-----------+
 
-> sum [would pop top 4 from stack 0, push 674.593 to stack 0]
+> sum [would pop top 3 from stack 0, push 674.593 to stack 0]
