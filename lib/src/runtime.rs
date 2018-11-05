@@ -18,7 +18,7 @@
 
 use std::slice::Iter;
 
-// use entry::*;
+use entry::*;
 use stack::*;
 use operator::*;
 use command::*;
@@ -54,19 +54,24 @@ impl Runtime {
 		self.active_mut().activate();
 	}
 
-	pub fn add(&mut self, s: Stack) {
-		self.stacks.push(s);
+	pub fn add(&mut self, s: String) {
+		self.stacks.push(Stack::new(s));
+		let a = self.stacks.len();
+		self.activate(a-1);
 	}
 
 	pub fn iter(&self) -> Iter<Stack> {
 		self.stacks.iter()
 	}
 
-	pub fn proc_cmd(&mut self, c: &Command) {
-		match c {
-			Command::Pop => { self.active_mut().pop(); },
-			Command::Stack(n) => self.activate(*n),
-			_ => (),
+	pub fn proc_cmd(&mut self) {
+		// peek guarantees stack is nonempty and contains Cmd on top
+		if let Entry::Cmd(c) = self.active_mut().pop().unwrap() {
+			match c {
+				Command::Stack(n) => self.activate(n),
+				Command::Add(s)   => self.add(s),
+				_ => (),
+			}
 		}
 	}
 }

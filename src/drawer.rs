@@ -61,6 +61,7 @@ macro_rules! boxchars {
 }
 // ╒╕╓╖┍┑┎┒╭╮╆╅┄┅┈┉╌╍┊┋┆┇╎╏
 // ╘╛╙╜┕┙┖┚╰╯╄╃╱╲╳
+
 // ┌───┐╔═════════╗┏━━━━━━━━━┓
 // │├┼┬│║╠╬╦╟╫╥╞╪╤║┃┣╋┳┠╁┰┝╈┯┃
 // │┴┼┤│║╩╬╣╨╫╢╧╪╡║┃┻╋┫┸╀┨┷╇┥┃
@@ -73,7 +74,7 @@ macro_rules! boxchars {
 //  ╵┡┩╂
 //  ┾┿┽╊
 boxchars!(REG, "┌", "┐", "└", "┘", "─", "│", "┤", "├", "┴", "┬");
-// boxchars!(BLD, "┏", "┓", "┗", "┛", "━", "┃", "┥", "┝", "┸", "┰");
+boxchars!(BLD, "┏", "┓", "┗", "┛", "━", "┃", "┥", "┝", "┸", "┰");
 boxchars!(DUB, "╔", "╗", "╚", "╝", "═", "║", "╡", "╞", "╨", "╥");
 
 pub fn draw_runtime(w: u16, h: u16, r: &mut Runtime) {
@@ -84,11 +85,12 @@ pub fn draw_runtime(w: u16, h: u16, r: &mut Runtime) {
 			break;
 		}
 	}
-	let mut b = false; // TODO: awful, figure out the real way to do this
+	// let mut b = false; // TODO: awful, figure out the real way to do this
 	if let Some(ref s) = r.status {
 		draw_status(&s, 2, h-1);
-		b = true;
-	} if b { r.status = None; }
+		// b = true;
+	}// if b {
+	r.status = None; //}
 	draw_ops(w-(OPS_W + 2), 2, OPS_W, h-5, &r.operators);
 	draw_prompt(h);
 }
@@ -135,7 +137,7 @@ fn draw_screen(w: u16, h: u16) {
 
 // WARNING: minimum w is 5
 fn draw_stack(x: u16, y: u16, w: u16, h: u16, s: &Stack) {
-	let b = if s.is_active() { &DUB } else { &REG };
+	let b = if s.is_active() { &BLD } else { &REG };
 	draw_box(x, y, w, h-1, b);
 	let l = s.name().len() as u16;
 	let o = if l <= w-4 { (w - (l+2)) / 2 } else { 1 };
@@ -143,13 +145,18 @@ fn draw_stack(x: u16, y: u16, w: u16, h: u16, s: &Stack) {
 	let y = y+1;
 	let h = h-3;
 	for (i, z) in s.iter().rev().enumerate() {
+		// TODO: most of this logic should be in entry
 		if let Entry::Num(n) = z {
 			print!("{0}{1:02}:{2:.>3$}",
 				   cursor::Goto(x+2, y+h-(i as u16)),
 				   i, n, w as usize - 7);
-			if i as u16 >= h {
-				break;
-			}
+		} else {
+			print!("{0}{1:02}:{2:?}",
+				   cursor::Goto(x+2, y+h-(i as u16)),
+				   i, z);
+		}
+		if i as u16 >= h {
+			break;
 		}
 	}
 }
@@ -166,10 +173,10 @@ fn draw_title(x: u16, y: u16, b: &BoxChars, s: &str) {
 fn fit_name(w: u16, s: &str) -> String{
 	if s.len() as u16 <= w {
 		s.to_string()
-		// let d = w - s.len() as u16;
-		// print!("{}{}", cursor::Goto(x+(d/2), y), s);
+			// let d = w - s.len() as u16;
+			// print!("{}{}", cursor::Goto(x+(d/2), y), s);
 	} else {
 		format!("{}…", &s[0..(w-1) as usize])
-		// print!("{}{}…", cursor::Goto(x, y), &s[0..(w-1) as usize]);
+			// print!("{}{}…", cursor::Goto(x, y), &s[0..(w-1) as usize]);
 	}
 }

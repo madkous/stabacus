@@ -16,8 +16,10 @@
 //
 // @license GPL-3.0-or-later <http://spdx.org/licenses/GPL-3.0-or-later>
 
-use entry::*;
 use std::slice::Iter;
+
+use entry::*;
+use command::*;
 
 #[derive(Debug)]
 pub struct Stack(Vec<Entry>, String, bool);
@@ -51,8 +53,8 @@ impl Stack {
 		self.0.as_slice()
 	}
 
-	pub fn peek(&self) -> Option<&Entry> {
-		self.0.as_slice().last()
+	pub fn peek(&self) -> Option<Entry> {
+		self.0.as_slice().last().map(Entry::clone)//.unwrap_or(&Entry::Cmd(Command::Id)).clone()
 	}
 
 	pub fn iter(&self) -> Iter<Entry> {

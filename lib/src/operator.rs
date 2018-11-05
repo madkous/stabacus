@@ -40,7 +40,7 @@ macro_rules! opmap { //TODO: consolidate with function definition macros
 			$(
 				temp_map.add_op($n, $a, $b);
 			)*
-			temp_map
+				temp_map
 		}
 	};
 }
@@ -115,6 +115,8 @@ impl OpMap {
 		("sum",     1, sum),
 		("prod",    1, prod),
 		("pop",     1, pop),
+		("stack",   1, stack),
+		("add",     0, add),
 		("swap",    2, swap),
 		("dup",     1, dup),
 		("q",       0, quit)]
@@ -292,8 +294,33 @@ fn quit(_v: &[Entry]) -> Vec<Entry> {
 	vec!(Entry::Die)
 }
 
+// TODO: implement command parsing separately
+// macro_rules! make_cmd {
+// 	( $i:ident ) => {
+// 		fn $i(_v: &[Entry]) -> Vec<Entry> {
+// 			vec!(Entry::Cmd(Command::$i))
+// 		}
+// 	}
+// }
+//
+// make_cmd!(Pop);
+// make_cmd!(Stack);
+// make_cmd!(Add);
+
 fn pop(_v: &[Entry]) -> Vec<Entry> {
 	vec!(Entry::Cmd(Command::Pop))
+}
+
+fn stack(v: &[Entry]) -> Vec<Entry> {
+	if let &[Entry::Num(n)] = v {
+		vec!(Entry::Cmd(Command::Stack(n as usize)))
+	} else {
+		ret_pan!("bad args: {:?}", v)
+	}
+}
+
+fn add(_v: &[Entry]) -> Vec<Entry> {
+	vec!(Entry::Cmd(Command::Add("new".to_string())))
 }
 
 // fn id(v: &[Entry]) -> Vec<Entry> {

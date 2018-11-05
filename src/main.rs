@@ -54,13 +54,14 @@ fn main() {
 		r.active_mut().push(e);
 
 		'proc: loop {
-			let p = r.active().peek();
-			match p { //r.active().peek() {
-				// Some(Entry::Panic(_)) => r.status = Some(r.active().panic()),
-				// Some(Entry::Op(_)) => r.active_mut().operate(),
-				// Some(Entry::Cmd(c)) => r.proc_cmd(c),
-				Some(Entry::Die) => break 'main,
-				_ => break 'proc,
+			match r.active().peek() {
+				Some(Entry::Panic(_)) => {
+					let s = Some(r.active_mut().panic());
+					r.status = s; },
+				Some(Entry::Op(_))    => r.active_mut().operate(),
+				Some(Entry::Cmd(_))   => r.proc_cmd(),
+				Some(Entry::Die)      => break 'main,
+				_                     => break 'proc,
 			}
 		}
 	}
