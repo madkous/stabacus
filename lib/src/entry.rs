@@ -25,20 +25,24 @@ use operator::*;
 #[derive(Clone,Debug)]
 pub enum Entry {
 	Op(Operator),
-	Int(i64),
+	Num(f64),
 	Panic(String),
+	Quote(Box<Entry>),
 	Die,
 	Pop,
+	Id,
 }
 
 impl fmt::Display for Entry {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match self {
 			Entry::Op(o)    => write!(f, "{}",  o),
-			Entry::Int(n)   => write!(f, "{}",  n),
-			Entry::Panic(s) => write!(f, "!{}", s),
+			Entry::Num(n)   => write!(f, "{}",  n),
+			Entry::Panic(s) => write!(f, "{}", s),
+			Entry::Quote(q) => write!(f, "'{}", q),
 			Entry::Die      => write!(f, "Die"),
 			Entry::Pop      => write!(f, "Pop"),
+			Entry::Id       => write!(f, "Id"),
 		}
     }
 }
@@ -46,15 +50,19 @@ impl fmt::Display for Entry {
 #[derive(Debug)]
 pub enum ParseType {
 	Str(String),
-	Int(i64),
+	Flt(f64),
+	Empty,
 }
 
 impl FromStr for ParseType {
 	type Err = ParseError;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		match s.parse::<i64>() {
-			Ok(n)  => Ok(ParseType::Int(n)),
+		if s.is_empty() {
+			return Ok(ParseType::Empty)
+		}
+		match s.parse::<f64>() {
+			Ok(n)  => Ok(ParseType::Flt(n)),
 			Err(_) => Ok(ParseType::Str(s.to_string())),
 		}
 	}
