@@ -23,7 +23,6 @@ use std::slice::Iter;
 pub struct Stack(Vec<Entry>, String, bool);
 
 impl Stack {
-	//reimplement new, len, push, pop, split_off
 	pub fn new(s: String) -> Stack {
 		Stack(Vec::new(), s, false)
 	}

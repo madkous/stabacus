@@ -40,13 +40,6 @@ fn main() {
 
 	'main: loop {
 		draw_runtime(scr_x, scr_y, &mut r);
-		// draw_screen(scr_x, scr_y);
-		// draw_stack(3, 2, 21, scr_y-4, &r.active());
-		// if let Some(s) = r.status {
-		// 	draw_status(&s, 2, scr_y-1);
-		// 	r.status = None;
-		// }
-		// draw_prompt(scr_y);
 		io::stdout().flush().unwrap();
 
 		let mut s = String::new();
@@ -58,15 +51,15 @@ fn main() {
 				Ok(val) => val,
 				Err(_) => panic!("parse error: {}", s),
 			};
-		r.active().push(e);
+		r.active_mut().push(e);
 
 		'proc: loop {
-			match r.active().peek() {
-				Some(Entry::Panic(_)) => r.status = Some(r.active().panic()),
-				Some(Entry::Op(_)) => r.active().operate(),
+			let p = r.active().peek();
+			match p { //r.active().peek() {
+				// Some(Entry::Panic(_)) => r.status = Some(r.active().panic()),
+				// Some(Entry::Op(_)) => r.active_mut().operate(),
+				// Some(Entry::Cmd(c)) => r.proc_cmd(c),
 				Some(Entry::Die) => break 'main,
-				Some(Entry::Pop) => { r.active().pop(); },
-				// Some(Entry::Id) => (),
 				_ => break 'proc,
 			}
 		}

@@ -19,6 +19,7 @@ use std::fmt;
 use std::collections::{BTreeMap, btree_map::Values};
 
 use entry::*;
+use command::*;
 
 #[derive(Debug)]
 pub struct OpMap(BTreeMap<String,Operator>);
@@ -110,6 +111,7 @@ impl OpMap {
 		("atanh",   1, unary_atanh),
 		("exp_m1",  1, unary_exp_m1),
 		("ln_1p",   1, unary_ln_1p),
+		("neg",     1, neg),
 		("sum",     1, sum),
 		("prod",    1, prod),
 		("pop",     1, pop),
@@ -142,7 +144,7 @@ impl OpMap {
 	pub fn get_entry(&self, p: ParseType) -> Entry {
 		match p {
 			ParseType::Flt(z)   => Entry::Num(z),
-			ParseType::Empty    => Entry::Id,
+			ParseType::Empty    => Entry::Cmd(Command::Id),
 			ParseType::Str(s)   => match self.get(&s) {
 				Some(o) => Entry::Op(o.clone()),
 				None    => Entry::Panic(format!("Unknown Operator \"{}\"", s)),
@@ -171,10 +173,10 @@ bin_op!(%, bin_remainder);
 macro_rules! unary_func {
 	( $op:tt, $n:ident ) => {
 		fn $n(v: &[Entry]) -> Vec<Entry> {
-			vec!(match v {
-				&[Entry::Num(x)] => Entry::Num(x.$op()),
-				_ => Entry::Panic(format!("bad args: {:?}", v)),
-			})
+			match v {
+				&[Entry::Num(x)] => ret_num!(x.$op()),
+				_ => ret_pan!("bad args: {:?}", v),
+			}
 		}
 	};
 }
@@ -211,10 +213,10 @@ unary_func!(ln_1p,  unary_ln_1p);
 macro_rules! bin_func {
 	( $op:tt, $n:ident ) => {
 		fn $n(v: &[Entry]) -> Vec<Entry> {
-			vec!(match v {
-				&[Entry::Num(x), Entry::Num(y)] => Entry::Num(x.$op(y)),
-				_ => Entry::Panic(format!("bad args: {:?}", v)),
-			})
+			match v {
+				&[Entry::Num(x), Entry::Num(y)] => ret_num!(x.$op(y)),
+				_ => ret_pan!("bad args: {:?}", v),
+			}
 		}
 	};
 }
@@ -259,12 +261,17 @@ nary_func!(*, 0, prod, "prod");
 
 // mean, median, mode, sort, neg, ..
 
-fn quit(_v: &[Entry]) -> Vec<Entry> {
-	vec!(Entry::Die)
-}
+// fn range(v: &[Entry]) -> Vec<Entry> {
+// 	match v {
+// 		&[Entry::Num(x), Entry::Num(y)] => {
+// 			v
+// 		_ => ret_pan!("bad args: {:?}", v),
 
-fn pop(_v: &[Entry]) -> Vec<Entry> {
-	vec!(Entry::Pop)
+fn neg(v: &[Entry]) -> Vec<Entry> {
+	match v {
+		&[Entry::Num(x)] => ret_num!(-x),
+		_ => ret_pan!("bad args: {:?}", v),
+	}
 }
 
 fn dup(v: &[Entry]) -> Vec<Entry> {
@@ -281,10 +288,18 @@ fn swap(v: &[Entry]) -> Vec<Entry> {
 	}
 }
 
-fn id(v: &[Entry]) -> Vec<Entry> {
-	match v {
-		&[ref z] => vec!(z.clone()),
-		_ => ret_pan!("bad args: {:?}", v),
-	}
+fn quit(_v: &[Entry]) -> Vec<Entry> {
+	vec!(Entry::Die)
 }
+
+fn pop(_v: &[Entry]) -> Vec<Entry> {
+	vec!(Entry::Cmd(Command::Pop))
+}
+
+// fn id(v: &[Entry]) -> Vec<Entry> {
+// 	match v {
+// 		&[ref z] => vec!(z.clone()),
+// 		_ => ret_pan!("bad args: {:?}", v),
+// 	}
+// }
 

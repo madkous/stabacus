@@ -16,10 +16,12 @@
 //
 // @license GPL-3.0-or-later <http://spdx.org/licenses/GPL-3.0-or-later>
 
+use std::slice::Iter;
+
 // use entry::*;
 use stack::*;
 use operator::*;
-use std::slice::Iter;
+use command::*;
 
 pub struct Runtime {
 	stacks: Vec<Stack>,
@@ -38,14 +40,18 @@ impl Runtime {
 		}
 	}
 
-	pub fn active(&mut self) -> &mut Stack{
+	pub fn active_mut(&mut self) -> &mut Stack{
 		&mut self.stacks[self.active]
 	}
 
+	pub fn active(&self) -> &Stack{
+		&self.stacks[self.active]
+	}
+
 	pub fn activate(&mut self, n: usize) {
-		self.active().deactivate();
+		self.active_mut().deactivate();
 		self.active = n;
-		self.active().activate();
+		self.active_mut().activate();
 	}
 
 	pub fn add(&mut self, s: Stack) {
@@ -54,6 +60,14 @@ impl Runtime {
 
 	pub fn iter(&self) -> Iter<Stack> {
 		self.stacks.iter()
+	}
+
+	pub fn proc_cmd(&mut self, c: &Command) {
+		match c {
+			Command::Pop => { self.active_mut().pop(); },
+			Command::Stack(n) => self.activate(*n),
+			_ => (),
+		}
 	}
 }
 

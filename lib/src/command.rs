@@ -16,17 +16,20 @@
 //
 // @license GPL-3.0-or-later <http://spdx.org/licenses/GPL-3.0-or-later>
 
-pub mod stack;
-pub mod entry;
-pub mod operator;
-pub mod runtime;
-pub mod command;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+use runtime::*;
+// use operator::*;
+
+#[derive(Clone,Debug)]
+pub enum Command {
+	Pop,
+	Id,
+	Add(String),
+	Stack(usize),
+	Write(String), //TODO: replace with the correct type
+	Load(String),
 }
+
+
+
 

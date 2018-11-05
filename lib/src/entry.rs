@@ -21,16 +21,16 @@ use std::str::FromStr;
 use std::string::ParseError;
 
 use operator::*;
+use command::*;
 
 #[derive(Clone,Debug)]
 pub enum Entry {
-	Op(Operator),
 	Num(f64),
 	Panic(String),
+	Cmd(Command),
+	Op(Operator),
 	Quote(Box<Entry>),
 	Die,
-	Pop,
-	Id,
 }
 
 impl fmt::Display for Entry {
@@ -40,9 +40,10 @@ impl fmt::Display for Entry {
 			Entry::Num(n)   => write!(f, "{}",  n),
 			Entry::Panic(s) => write!(f, "{}", s),
 			Entry::Quote(q) => write!(f, "'{}", q),
+			Entry::Cmd(_)   => write!(f, "cmd"),
 			Entry::Die      => write!(f, "Die"),
-			Entry::Pop      => write!(f, "Pop"),
-			Entry::Id       => write!(f, "Id"),
+			// Entry::Pop      => write!(f, "Pop"),
+			// Entry::Id       => write!(f, "Id"),
 		}
     }
 }
