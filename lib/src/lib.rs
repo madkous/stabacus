@@ -19,6 +19,7 @@
 pub mod stack;
 pub mod entry;
 pub mod operator;
+pub mod runtime;
 
 #[cfg(test)]
 mod tests {
@@ -27,3 +28,4 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
+
