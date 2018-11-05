@@ -20,16 +20,24 @@ use entry::*;
 use std::slice::Iter;
 
 #[derive(Debug)]
-pub struct Stack(Vec<Entry>, String);
+pub struct Stack(Vec<Entry>, String, bool);
 
 impl Stack {
 	//reimplement new, len, push, pop, split_off
 	pub fn new(s: String) -> Stack {
-		Stack(Vec::new(), s)
+		Stack(Vec::new(), s, false)
+	}
+
+	pub fn make_temp(v: Vec<Entry>) -> Stack {
+		Stack(v, "tmp".to_string(), false)
 	}
 
 	pub fn len(&self) -> usize {
 		self.0.len()
+	}
+
+	pub fn append(&mut self, other: &mut Stack) {
+		self.0.append(&mut other.0)
 	}
 
 	pub fn push(&mut self, v: Entry) {
@@ -56,32 +64,48 @@ impl Stack {
 		&self.1
 	}
 
+	pub fn is_active(&self) -> bool {
+		self.2
+	}
+
+	pub fn activate(&mut self) {
+		self.2 = true;
+	}
+
+	pub fn deactivate(&mut self) {
+		self.2 = false;
+	}
+
 	pub fn pop_slice(&mut self, depth: usize) -> Stack {
 		assert!(depth <= self.len(), "`depth` greater than stack height");
 		let height = self.len() - depth;
-		Stack(self.0.split_off(height), "args".to_string())
+		Stack(self.0.split_off(height), "args".to_string(), false)
 	}
 
 	pub fn operate(&mut self) {
 		let r = match self.pop() {
 			Some(Entry::Op(op)) =>
 				if self.len() < op.arity{
-					Entry::Panic(format!("cannot apply: {} has arity {}, stack has {} elements",
-										 op.name, op.arity, self.len()))
+					vec!(Entry::Panic(format!("cannot apply: {} has arity {}, stack has {} elements",
+										 op.name, op.arity, self.len())))
 				} else {
-					let args = self.pop_slice(op.arity);
-					(op.body)(args.as_slice())
+					let mut args = self.pop_slice(op.arity);
+					let ret = (op.body)(args.as_slice());
+					if let &[Entry::Panic(_)] = ret.as_slice() {
+						self.append(&mut args);
+					}
+					ret
 				},
 			Some(e) =>
-				Entry::Panic(format!("tried to operate with non-operator entry: {:?}",
-									 e)),
+				vec!(Entry::Panic(format!("tried to operate with non-operator entry: {:?}",
+									 e))),
 			None =>
-				Entry::Panic("tried to operate with empty stack".to_string()),
+				vec!(Entry::Panic("tried to operate with empty stack".to_string())),
 		};
-		self.push(r);
+		self.append(&mut Stack::make_temp(r));
 	}
 
 	pub fn panic(&mut self) -> String {
-		format!("Panicked on: {:?}", self.pop())
+		format!("PANIC! {}", self.pop().unwrap())
 	}
 }
