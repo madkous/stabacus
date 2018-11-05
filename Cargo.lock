@@ -1,16 +1,4 @@
 [[package]]
-name = "calc"
-version = "0.1.0"
-dependencies = [
- "lib 0.1.0",
- "termion 1.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "lib"
-version = "0.1.0"
-
-[[package]]
 name = "libc"
 version = "0.2.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -27,6 +15,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "redox_syscall 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "stabacus"
+version = "0.1.0"
+dependencies = [
+ "stablib 0.1.0",
+ "termion 1.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "stablib"
+version = "0.1.0"
 
 [[package]]
 name = "termion"

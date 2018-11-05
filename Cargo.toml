@@ -1,12 +1,12 @@
 [package]
-name = "calc"
+name = "stabacus"
 version = "0.1.0"
 authors = ["Matthew Kousoulas <shaman.kous@gmail.com>"]
 
 [workspace]
 
 [dependencies]
-lib = { path = "lib" }
+stablib = { path = "lib" }
 termion = "1"
 # syn = "0.15"
 # quote = "0.6"
