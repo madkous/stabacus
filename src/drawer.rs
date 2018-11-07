@@ -26,7 +26,8 @@ use stablib::stack::*;
 use stablib::runtime::*;
 use stablib::operator::*;
 
-const STACK_W: u16 = 25;
+const STACK_MAX_W: u16 = 45;
+const STACK_MIN_W: u16 = 25;
 const OPS_W: u16 = 15;
 
 struct BoxChars {
@@ -79,20 +80,15 @@ boxchars!(DUB, "╔", "╗", "╚", "╝", "═", "║", "╡", "╞", "╨", "�
 
 pub fn draw_runtime(w: u16, h: u16, r: &mut Runtime) {
 	draw_screen(w, h);
-	for (i, s) in r.iter().enumerate() {
-		draw_stack(3 + (STACK_W * i as u16), 2, STACK_W, h-4, &s);
-		if i as u16 >= w - (OPS_W + 4) / (STACK_W + 1) {
-			break;
-		}
-	}
+	draw_stacks(w - (OPS_W + 5), h, r);
 	// let mut b = false; // TODO: awful, figure out the real way to do this
 	if let Some(ref s) = r.status {
 		draw_status(&s, 2, h-1);
 		// b = true;
 	}// if b {
 	r.status = None; //}
-	draw_ops(w-(OPS_W + 2), 2, OPS_W, h-5, &r.operators);
-	draw_prompt(h);
+draw_ops(w-(OPS_W + 2), 2, OPS_W, h-5, &r.operators);
+draw_prompt(h);
 }
 
 pub fn reset_screen() {
@@ -158,6 +154,43 @@ fn draw_stack(x: u16, y: u16, w: u16, h: u16, s: &Stack) {
 		if i as u16 >= h {
 			break;
 		}
+	}
+}
+
+fn draw_stacks(w: u16, h: u16, r: &mut Runtime) {
+	// maximum number of stacks given width
+	let n = (w / STACK_MIN_W) as usize;
+	// print!("N: {}  ", n);
+	let z = r.num_stacks();
+	// width of each stack given n
+	let e = (w / n.min(z) as u16).min(STACK_MAX_W); // works
+	let k; // start index
+	let l; // stop index
+	if (n as usize) >= z {
+		k = 0 as usize;
+		l = z as usize;
+	} else {
+		let a = r.active_ind();
+		if a < n / 2 {
+			k = 0;
+			l = n;
+		} else if a >= z - n / 2 {
+			k = z - n;
+			l = z;
+		} else {
+			k = a - n / 2;
+			l = a + (n - (n / 2));
+		}
+	}
+
+	for (i, s) in r.iter().enumerate() {
+		if i < k {
+			continue;
+		}
+		if i >= l {
+			break;
+		}
+		draw_stack(3 + (e * (i-k) as u16), 2, e, h-4, &s);
 	}
 }
 
