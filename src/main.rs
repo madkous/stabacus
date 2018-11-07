@@ -59,7 +59,9 @@ fn main() {
 					let s = Some(r.active_mut().panic());
 					r.status = s; },
 				Some(Entry::Op(_))    => r.active_mut().operate(),
-				Some(Entry::Cmd(_))   => r.proc_cmd(),
+				Some(Entry::Cmd(_))   => {
+					let s = Some(r.proc_cmd());
+					r.status = s; },
 				Some(Entry::Die)      => break 'main,
 				_                     => break 'proc,
 			}

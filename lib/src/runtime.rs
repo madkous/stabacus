@@ -32,12 +32,14 @@ pub struct Runtime {
 
 impl Runtime {
 	pub fn new(s: &str) -> Runtime {
-		Runtime {
+		let mut r = Runtime {
 			stacks: vec!(Stack::new("main".to_string())),
 			active: 0,
 			operators: OpMap::default(),
 			status: Some(s.to_string()),
-		}
+		};
+		r.activate(0);
+		r
 	}
 
 	pub fn active_mut(&mut self) -> &mut Stack{
@@ -48,30 +50,46 @@ impl Runtime {
 		&self.stacks[self.active]
 	}
 
-	pub fn activate(&mut self, n: usize) {
-		self.active_mut().deactivate();
-		self.active = n;
-		self.active_mut().activate();
+	pub fn activate(&mut self, n: usize) -> String {
+		if n < self.num_stacks() {
+			self.active_mut().deactivate();
+			self.active = n;
+			self.active_mut().activate();
+			return format!("Switched to stack {}.", n)
+		} else {
+			format!("Could not switch to stack {}: out of bounds", n)
+		}
 	}
 
-	pub fn add(&mut self, s: String) {
-		self.stacks.push(Stack::new(s));
+	pub fn active_ind(&mut self) -> usize {
+		self.active
+	}
+
+	pub fn add(&mut self, s: String) -> String {
+		self.stacks.push(Stack::new(s.clone()));
 		let a = self.stacks.len();
 		self.activate(a-1);
+		format!("Added new stack {}:{}", a-1, s)
 	}
 
 	pub fn iter(&self) -> Iter<Stack> {
 		self.stacks.iter()
 	}
 
-	pub fn proc_cmd(&mut self) {
+	pub fn num_stacks(&self) -> usize {
+		self.stacks.len()
+	}
+
+	pub fn proc_cmd(&mut self) -> String {
 		// peek guarantees stack is nonempty and contains Cmd on top
 		if let Entry::Cmd(c) = self.active_mut().pop().unwrap() {
 			match c {
 				Command::Stack(n) => self.activate(n),
 				Command::Add(s)   => self.add(s),
-				_ => (),
+				_ => format!("Unimplemented Command {:?}", c),
 			}
+		} else {
+			format!("Unknown error, fuck")
 		}
 	}
 }
