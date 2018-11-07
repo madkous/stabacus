@@ -1,5 +1,5 @@
 Commands:
-sort, mean, median, mode
-
-multistacks, paired stacks, numeric tower, aliases
+-sort, mean, median, mode
+-paired stacks, numeric tower, aliases
+-signal handling, real input parsing, modal editing
 

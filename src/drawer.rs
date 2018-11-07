@@ -31,16 +31,11 @@ const STACK_MIN_W: u16 = 25;
 const OPS_W: u16 = 15;
 
 struct BoxChars {
-	tl_cor: &'static str,
-	tr_cor: &'static str,
-	bl_cor: &'static str,
-	br_cor: &'static str,
-	h_bar:  &'static str,
-	v_bar:  &'static str,
-	l_head: &'static str,
-	r_head: &'static str,
-	t_head: &'static str,
-	b_head: &'static str,
+	tl_cor: &'static str, tr_cor: &'static str,
+	bl_cor: &'static str, br_cor: &'static str,
+	h_bar:  &'static str, v_bar:  &'static str,
+	l_head: &'static str, r_head: &'static str,
+	t_head: &'static str, b_head: &'static str,
 }
 
 macro_rules! boxchars {
@@ -60,20 +55,10 @@ macro_rules! boxchars {
 		};
 	};
 }
-// ╒╕╓╖┍┑┎┒╭╮╆╅┄┅┈┉╌╍┊┋┆┇╎╏
-// ╘╛╙╜┕┙┖┚╰╯╄╃╱╲╳
-
-// ┌───┐╔═════════╗┏━━━━━━━━━┓
-// │├┼┬│║╠╬╦╟╫╥╞╪╤║┃┣╋┳┠╁┰┝╈┯┃
-// │┴┼┤│║╩╬╣╨╫╢╧╪╡║┃┻╋┫┸╀┨┷╇┥┃
-// └───┘╚═════════╝┗━━━━━━━━━┛
-//  ╷┟┧┲┱┮┭╶╼╸╺╾╴
-//  ╽┞┦┺┹┶┵
-//  ╹╆╅╁
-//  ╻╄╃╀
-//  ╿┢┪╉
-//  ╵┡┩╂
-//  ┾┿┽╊
+// ┌───┐╔═════════╗┏━━━━━━━━━┓ ╒╕╓╖┍┑┎┒╭╮╆╅┄┅┈┉╌╍┊┋┆┇╎╏ ╻╷┟┧┢┪╉╆╅╁┾┿┽╊
+// │├┼┬│║╠╬╦╟╫╥╞╪╤║┃┣╋┳┠╁┰┝╈┯┃ ╘╛╙╜┕┙┖┚╰╯╄╃╱╲╳          ╿╽┞┦┡┩╂╄╃╀
+// │┴┼┤│║╩╬╣╨╫╢╧╪╡║┃┻╋┫┸╀┨┷╇┥┃ ┲┱┮┭╶╼╸╺╾╴               ╵╹
+// └───┘╚═════════╝┗━━━━━━━━━┛ ┺┹┶┵
 boxchars!(REG, "┌", "┐", "└", "┘", "─", "│", "┤", "├", "┴", "┬");
 boxchars!(BLD, "┏", "┓", "┗", "┛", "━", "┃", "┥", "┝", "┸", "┰");
 boxchars!(DUB, "╔", "╗", "╚", "╝", "═", "║", "╡", "╞", "╨", "╥");
@@ -81,14 +66,12 @@ boxchars!(DUB, "╔", "╗", "╚", "╝", "═", "║", "╡", "╞", "╨", "�
 pub fn draw_runtime(w: u16, h: u16, r: &mut Runtime) {
 	draw_screen(w, h);
 	draw_stacks(w - (OPS_W + 5), h, r);
-	// let mut b = false; // TODO: awful, figure out the real way to do this
 	if let Some(ref s) = r.status {
 		draw_status(&s, 2, h-1);
-		// b = true;
-	}// if b {
-	r.status = None; //}
-draw_ops(w-(OPS_W + 2), 2, OPS_W, h-5, &r.operators);
-draw_prompt(h);
+	}
+	r.status = None; // TODO: can this be moved into the conditional?
+	draw_ops(w-(OPS_W + 2), 2, OPS_W, h-5, &r.operators);
+	draw_prompt(h);
 }
 
 pub fn reset_screen() {
@@ -160,7 +143,6 @@ fn draw_stack(x: u16, y: u16, w: u16, h: u16, s: &Stack) {
 fn draw_stacks(w: u16, h: u16, r: &mut Runtime) {
 	// maximum number of stacks given width
 	let n = (w / STACK_MIN_W) as usize;
-	// print!("N: {}  ", n);
 	let z = r.num_stacks();
 	// width of each stack given n
 	let e = (w / n.min(z) as u16).min(STACK_MAX_W); // works
