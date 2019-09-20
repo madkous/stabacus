@@ -69,4 +69,8 @@ fn main() {
 	}
 	reset_screen();
 	screen.flush().unwrap();
+
+	let x: u16 = 5;
+	let y = x - 10;
+	println!("bye {}", y);
 }

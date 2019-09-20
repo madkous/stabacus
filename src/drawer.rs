@@ -42,23 +42,19 @@ macro_rules! boxchars {
 	( $id:ident, $tl:expr, $tr:expr, $bl:expr, $br:expr, $h:expr, $v:expr,
 	  $lh:expr, $rh:expr, $th:expr, $bh:expr ) => {
 		const $id: BoxChars = BoxChars{
-			tl_cor: $tl,
-			tr_cor: $tr,
-			bl_cor: $bl,
-			br_cor: $br,
-			h_bar:  $h,
-			v_bar:  $v,
-			l_head: $lh,
-			r_head: $rh,
-			t_head: $th,
-			b_head: $bh,
+			tl_cor: $tl, tr_cor: $tr,
+			bl_cor: $bl, br_cor: $br,
+			h_bar:  $h, v_bar:  $v,
+			l_head: $lh, r_head: $rh,
+			t_head: $th, b_head: $bh,
 		};
 	};
 }
-// ┌───┐╔═════════╗┏━━━━━━━━━┓ ╒╕╓╖┍┑┎┒╭╮╆╅┄┅┈┉╌╍┊┋┆┇╎╏ ╻╷┟┧┢┪╉╆╅╁┾┿┽╊
-// │├┼┬│║╠╬╦╟╫╥╞╪╤║┃┣╋┳┠╁┰┝╈┯┃ ╘╛╙╜┕┙┖┚╰╯╄╃╱╲╳          ╿╽┞┦┡┩╂╄╃╀
-// │┴┼┤│║╩╬╣╨╫╢╧╪╡║┃┻╋┫┸╀┨┷╇┥┃ ┲┱┮┭╶╼╸╺╾╴               ╵╹
-// └───┘╚═════════╝┗━━━━━━━━━┛ ┺┹┶┵
+// collection of box drawing characters from u+25xx
+// ┌───┐ ╔═════════╗ ┏━━━━━━━━━┓ ╒╕╓╖┍┑┎┒╭╮╆╅ ┊┋ ╷┟┧┢┪╉╆╅╁┾┿┽
+// │├┼┬│ ║╠╬╦╟╫╥╞╪╤║ ┃┣╋┳┠╁┰┝╈┯┃ ╘╛╙╜┕┙┖┚╰╯╄╃ ┆┇ ╽┞┦┡┩╂╄╃╀
+// │┴┼┤│ ║╩╬╣╨╫╢╧╪╡║ ┃┻╋┫┸╀┨┷╇┥┃ ┲┱┮┭╶╼╸╺╾╴╎╏ ╵╹ ╻    ╊
+// └───┘ ╚═════════╝ ┗━━━━━━━━━┛ ┺┹┶┵┄┈╌┅┉╍╱╲╳   ╿
 boxchars!(REG, "┌", "┐", "└", "┘", "─", "│", "┤", "├", "┴", "┬");
 boxchars!(BLD, "┏", "┓", "┗", "┛", "━", "┃", "┥", "┝", "┸", "┰");
 boxchars!(DUB, "╔", "╗", "╚", "╝", "═", "║", "╡", "╞", "╨", "╥");
